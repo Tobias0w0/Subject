@@ -1,0 +1,19 @@
+{%extends '_layout.html'%}
+
+{% block title%} Sign Upb {%endblock%}
+
+{%block content%}
+
+<form method="post">
+    <label for="email"> Email:</label>
+    <input id="email" name="email" type="email">
+    <br>
+    <label for="passowrd"> Password:</label>
+    <input id="MyInput" name="password" type="password">
+    <input type="checkbox" onclick="myFunction()">
+
+    <br>
+    <input type="submit" value="login">
+
+</form>
+{%endblock%}

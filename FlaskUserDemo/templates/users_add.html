@@ -1,0 +1,52 @@
+{%extends '_layout.html'%}
+
+{% block title%} Sign Up{%endblock%}
+
+{%block content%}
+
+
+<form method="post" enctype="multipart/form-data">
+    <label for="first_name">First Name:</label>
+    <input id="first_name" name="first_name">
+    <br>
+
+    <label for="last_name">Last Name:</label>
+    <input id="last_name" name="last_name">
+    <br>
+
+    <label for="email">Email:</label>
+    <p id="message"></p>
+    <input id="email" name="email">
+
+    <br>
+    <label for="password">Password:</label>
+    <input id="password" name="password" type="password">
+
+    <br>
+    <label for="pic"> Profile Picture</label>
+    <input id="pic" type="file" name="avatar">
+    <br>
+    <input type="submit" vale="Sign Up">
+</form>
+
+<script>
+    let emailInput = document.querySelector('#email');
+    let message = document.querySelector('#message');
+
+    emailInput.addEventListener('input', checkUniqueEmail);
+
+    
+
+    //#fetch
+    async function checkUniqueEmail() {
+        let response = await fetch("/checkemail?email=" + emailInput.vaule);
+        let json = await response.json();
+
+        if (json.status == 'ok') {
+            message.style.color = 'red';
+            message.textContent = 'Email is taken';
+        }
+    }
+</script>
+
+{%endblock%}

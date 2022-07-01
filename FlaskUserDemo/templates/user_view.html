@@ -1,0 +1,31 @@
+{%extends '_layout.html'%}
+
+
+{% block title%} Sign Up{%endblock%}
+
+
+{%block content%}
+<h1>
+    {{result.first_name}}
+    {{result.Last_name}}
+    {{result.Email}}
+</h1>
+
+<h1>
+    {{result.title}}
+    {{result.director}}
+    {{result.year_release}}
+</h1>
+
+
+<img src="{{ url_for('static', filename='images/' + (result.avatar or 'default.png')) }}" height="202">
+
+<p>
+    <a href="/edit?id={{result.id}}">Edit</a>
+    <a href="/delete?id={{result.id}}">Delete</a>
+</p>
+
+<p>
+    <a href="{{ url_for('list_user') }}"> Back to dashboard</a>
+</p>
+    {%endblock%}

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+
+
+<body>
+    
+    <a>
+        {% if 'logged_in' in session %}
+            You are logged in <a href="/logout">Log out</a>
+        {%else%}
+            <a href="/login">login</a>
+        {% endif %}
+    </a>
+    {%block content%}
+    {%endblock%}
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends '_layout.html' %}
+
+{% block title%} subject_selection {% endblock%}
+{%block content%}
+
+<p>
+    <a href="{{ url_for('subject') }}"> List</a>
+</p>
+
+<table id="subject_selection">
+    <tr>
+        <th>Subject</th>
+    </tr>
+
+    {% for row in result %}
+    <tr>
+        <td> {{row.Yr11_Subjects}} </td>
+
+        <td>
+            <a href="/select?id={{row.id}}" onclick="return confirm('are you sure you want to go to this class for the whole year. think carefully and dont regret your decision')">Select</a>
+        </td>
+    </tr>
+    {%endfor%}
+</table>
+    {%endblock%}
+
