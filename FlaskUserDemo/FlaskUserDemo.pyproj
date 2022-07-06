@@ -37,6 +37,7 @@
     <Content Include="static\css\custom.css" />
     <Content Include="static\images\default.png" />
     <Content Include="templates\index.html" />
+    <Content Include="templates\subject_selected.html" />
     <Content Include="templates\subject_selection.html" />
     <Content Include="templates\setup.html" />
     <Content Include="templates\register.html" />

@@ -10,7 +10,7 @@ app.register_blueprint(setup)
 
 @app.before_request
 def restrict():
-    restricted_pages=['list_user','view_user','edit_user','select_user', 'dashboard']
+    restricted_pages=['list_user','view_user','edit_user','select_user', 'subject']
     if 'logged_in' not in session and request.endpoint in restricted_pages:
         return redirect('/register')
         
@@ -74,25 +74,21 @@ def view_user():
     return render_template('user_view.html', result=result)
 
 
-# TODO: Add a '/select_user' route that uses DELETE
-
+# TODO: Add a '/select_user' route that uses SELECT
 @app.route('/select')
 def select_user():
+    #add subject into database
     with create_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM user WHERE id=%s", request.args['id'])
+            cursor.execute("INSERT INTO subject_id (User_id,Subject_id) VALUES (%s, %s)", (session['id'],request.args['id']))
             connection.commit()
-            session['Yr11_Subjects'] = result['Yr11_Subjects']
-            session['id'] = result['id']
-            return redirect('/subject')
+            return redirect('/selected_subject')
 
 
 
 # TODO: Add an '/edit_user' route that uses UPDATE
 @app.route('/edit', methods=['GET', 'POST'])
-
 def edit_user():
-
     #admin users are allowed, users with the right id are allowed, everyone else sees error 404
     if session['role'] != 'admin' and str(session['id']) !=request.args['id']:
         return abort(404)
@@ -113,14 +109,12 @@ def edit_user():
             with connection.cursor() as cursor:
                 sql = """INSERT INTO users (first_name, last_name, email, password, avatar) VALUES (%s, %s, %s, %s)"""
 
-
                 vaules=(request.form['first_name'],
                         request.form['last_name'],
                         request.form['email'],
                         request.form['password'],
                         avatar_filename,
-                        request.form['id']
-                        )
+                        request.form['id'])
                 cursor.execute(sql,vaules)
                 connection.commit()
         return redirect('/view?id=' + request.form['id'])
@@ -139,7 +133,6 @@ def login():
         #encrypt password
         password = request.form['password']
         encrypted_password = hashlib.sha256(password.encode()).hexdigest()
-            
 
         with create_connection() as connection:
             with connection.cursor() as cursor:
@@ -151,7 +144,8 @@ def login():
 
             if result:
 
-                session['login'] = True
+                session['logged_in'] = True
+                session['id'] = result['id']
                 return redirect('/subject')
                 return "you are logged in as " + result['first_name']
             else:
@@ -163,8 +157,8 @@ def login():
 def logout():
     session.clear()
     return redirect('/')
-
  # email taken
+
 @app.route('/checkmail')
 def check_email():
      with create_connection() as connection: 
@@ -175,15 +169,14 @@ def check_email():
           cusor.execute(sql,vaules)
           result = cursor.fecthtone()
 
-@app.route('/movies')
-def movies():
-    if session['role'] !='admin':
-        return redirect('/')
+@app.route('/selected_subject')
+def selected_subject():
     with create_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM users")
+            cursor.execute("SELECT * FROM tobheyes_databass.subject_id")
             result = cursor.fetchall()
-    return render_template('moviesID.html', result=result )
+    return render_template('subject_selection.html')
+
 
 @app.route('/subject')
 def subject():
