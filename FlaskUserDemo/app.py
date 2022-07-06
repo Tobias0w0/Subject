@@ -40,7 +40,6 @@ def add_user():
                         request.form['email'],
                         encrypted_password,
                         avatar_filename)
-
                 try:
                     cursor.execute(sql, vaules)
                     connection.commit()
@@ -85,6 +84,14 @@ def select_user():
             return redirect('/selected_subject')
 
 
+# TODO: Add a '/delete_user' route that uses DELETE
+@app.route('/delete')
+def delete_user():
+    with create_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM subject_id")
+            connection.commit()
+            return redirect('/selected_subject')
 
 # TODO: Add an '/edit_user' route that uses UPDATE
 @app.route('/edit', methods=['GET', 'POST'])
@@ -171,11 +178,12 @@ def check_email():
 
 @app.route('/selected_subject')
 def selected_subject():
+    #gets data from database
     with create_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM tobheyes_databass.subject_id")
+            cursor.execute("SELECT * FROM tobheyes_databass.subject_id JOIN users ON User_id = users.id JOIN subject_selection ON Subject_id = subject_selection.id")
             result = cursor.fetchall()
-    return render_template('subject_selection.html')
+    return render_template('subject_selection.html', result=result)
 
 
 @app.route('/subject')
@@ -185,6 +193,7 @@ def subject():
             cursor.execute("SELECT * FROM tobheyes_databass.subject_selection")
             result = cursor.fetchall()
     return render_template('subject_selection.html', result=result )
+
 
 if __name__ == '__main__':
     import os
@@ -198,3 +207,4 @@ if __name__ == '__main__':
     except ValueError: 
         PORT = 5555
     app.run(HOST, PORT, debug=True)
+
