@@ -8,9 +8,12 @@
 <a id="sign_up" href={{ url_for('add_user')}}> Sign Up</a>
 <br>
     {% if session['role'] == 'admin' %}
-<a href={{ url_for('list_users')}}>View All Users</a>
+<a href={{ url_for('list_user')}}>View All Users</a>
+<a href={{ url_for('add_subject')}}>Add Subject</a>
+
     {% elif 'logged_in' in session %}
 <a href="{{ url_for('view_user', id = session['id'])}}">View Your Account</a>
+
 
     {% endif %}
     {% endblock %}

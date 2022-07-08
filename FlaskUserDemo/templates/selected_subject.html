@@ -1,5 +1,4 @@
 {% extends '_layout.html' %}
-
 {% block title%} selected subject {% endblock%}
 {%block content%}
 
@@ -9,16 +8,20 @@
 
 <table id="subject_id">
     <tr>
-        <th>Your subjects</th>
+        <th>User id</th>
+        <th>Name</th>
+        <th>Your Subject</th>
     </tr>
     {% for row in result %}
     <tr>
-        <td> {{row.Subject_id}} </td>
         <td> {{row.User_id}} </td>
+        <td> {{row.first_name}} {{row.last_name}} </td>
+        <td> {{row.Yr11_Subjects}} </td>
 
         <td>
-            <a href="/delete?id={{row.id}}" onclick="return confirm('Are you sure')">Delete</a>
-        
+            <a href="/delete?id={{row.Subject_id}}" onclick="return confirm('Are you sure')">Delete</a>
+            <a href="/edit?id={{row.Subject_id}}" onclick="return confirm('Are you sure')">Edit</a>
+
         </td>
     </tr>
     {%endfor%}

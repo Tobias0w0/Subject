@@ -13,9 +13,14 @@
         <td> {{row.Yr11_Subjects}} </td>
 
         <td>
-            <a href="/select?id={{row.id}}" onclick="return confirm('are you sure you want to go to this class for the whole year. think carefully and dont regret your decision')">Select</a>
+            <a href="/select?id={{row.id}}" onclick="return confirm('are you sure')">Select</a>
+
+            {% if session['role'] == 'admin' %}
+            <a href="/delete_admin?id={{row.id}}" onclick="return confirm('Are you sure')">Delete</a>
         </td>
+
     </tr>
+    {% endif %}
     {%endfor%}
 </table>
     {%endblock%}

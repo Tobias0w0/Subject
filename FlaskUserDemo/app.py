@@ -10,13 +10,17 @@ app.register_blueprint(setup)
 
 @app.before_request
 def restrict():
-    restricted_pages=['list_user','view_user','edit_user','select_user', 'subject']
+    restricted_pages=['list_user','view_user','edit_user','select_user', 'subject', 'selected_subject']
     if 'logged_in' not in session and request.endpoint in restricted_pages:
         return redirect('/register')
         
 @app.route('/')
-def home():
+def home(): 
     return render_template("index.html")
+
+@app.route('/home')
+def login_home(): 
+    return render_template("Home.html")
 
 # TODO: Add a '/register' (add_user) route that uses INSERT
 @app.route('/register', methods=['GET', 'POST'])
@@ -35,7 +39,7 @@ def add_user():
             with connection.cursor() as cursor:
                 sql = """INSERT INTO users (first_name, last_name, email, password, avatar) VALUES (%s, %s, %s, %s, %s)"""
 
-                vaules=(request.formjust['first_name'],
+                vaules=(request.form['first_name'],
                         request.form['last_name'],
                         request.form['email'],
                         encrypted_password,
@@ -48,6 +52,21 @@ def add_user():
                         return redirect('/register')
                 return redirect('/')
     return render_template('users_add.html')
+
+
+# add subject to list
+@app.route('/add_subject', methods=['GET', 'POST'])
+def add_subject():
+    if request.method == 'POST':
+
+        with create_connection() as connection:
+            with connection.cursor() as cursor:
+                sql = """INSERT INTO subject_selection (Yr11_Subjects) VALUES (%s)"""
+                vaules=(request.form['subject_name'])
+                cursor.execute(sql, vaules)
+                connection.commit()
+                return redirect('/')
+    return render_template('subject_add.html')
 
 # TODO: Add a '/dashboard' (list_users) route that uses SELECT
 
@@ -83,22 +102,29 @@ def select_user():
             connection.commit()
             return redirect('/selected_subject')
 
-
 # TODO: Add a '/delete_user' route that uses DELETE
 @app.route('/delete')
 def delete_user():
     with create_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM subject_id")
+            cursor.execute("DELETE FROM subject_id WHERE User_id=%s AND Subject_id=%s", (session['id'],request.args['id']))
             connection.commit()
             return redirect('/selected_subject')
+
+@app.route('/delete_admin')
+def delete_admin():
+    with create_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM subject_selection WHERE id=%s", (request.args['id']))
+            connection.commit()
+            return redirect('/subject')
 
 # TODO: Add an '/edit_user' route that uses UPDATE
 @app.route('/edit', methods=['GET', 'POST'])
 def edit_user():
     #admin users are allowed, users with the right id are allowed, everyone else sees error 404
     if session['role'] != 'admin' and str(session['id']) !=request.args['id']:
-        return abort(404)
+            return abort(404)
 
     if request.method == 'POST':
 
@@ -114,23 +140,20 @@ def edit_user():
 
         with create_connection() as connection:
             with connection.cursor() as cursor:
-                sql = """INSERT INTO users (first_name, last_name, email, password, avatar) VALUES (%s, %s, %s, %s)"""
+                sql = """INSERT INTO users (User_id,Subject_id) VALUES (%s, %s)"""
 
-                vaules=(request.form['first_name'],
-                        request.form['last_name'],
-                        request.form['email'],
-                        request.form['password'],
-                        avatar_filename,
-                        request.form['id'])
+                vaules=(request.form['User_id'],
+                        request.form['Subject_id'],)
                 cursor.execute(sql,vaules)
+
                 connection.commit()
-        return redirect('/view?id=' + request.form['id'])
+        return redirect('/view?id=' + request.form['Subject_id'])
     else:
         with create_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT * FROM users WHERE id = %s", request.args['id'])
                 result = cursor.fetchone()
-                return render_template('users_edit.html', result=result)
+                return redirect('/subject')
 
 
 @app.route('/login', methods=['GET','POST'])
@@ -148,15 +171,15 @@ def login():
 
                 cursor.execute(sql,values)
                 result = cursor.fetchone()
-
             if result:
-
                 session['logged_in'] = True
                 session['id'] = result['id']
-                return redirect('/subject')
+                session['role'] = result['role']
+                return redirect('/home')
                 return "you are logged in as " + result['first_name']
             else:
                 return redirect('/login')
+            
     else:
         return render_template('users_login.html')
 
@@ -164,7 +187,7 @@ def login():
 def logout():
     session.clear()
     return redirect('/')
- # email taken
+ #see if email taken
 
 @app.route('/checkmail')
 def check_email():
@@ -176,16 +199,6 @@ def check_email():
           cusor.execute(sql,vaules)
           result = cursor.fecthtone()
 
-@app.route('/selected_subject')
-def selected_subject():
-    #gets data from database
-    with create_connection() as connection:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM tobheyes_databass.subject_id JOIN users ON User_id = users.id JOIN subject_selection ON Subject_id = subject_selection.id")
-            result = cursor.fetchall()
-    return render_template('subject_selection.html', result=result)
-
-
 @app.route('/subject')
 def subject():
     with create_connection() as connection:
@@ -193,6 +206,18 @@ def subject():
             cursor.execute("SELECT * FROM tobheyes_databass.subject_selection")
             result = cursor.fetchall()
     return render_template('subject_selection.html', result=result )
+
+@app.route('/selected_subject')
+def selected_subject():
+    #select data from database
+    with create_connection() as connection:
+        with connection.cursor() as cursor:
+            if session['role'] != 'admin':
+                cursor.execute("SELECT * FROM tobheyes_databass.subject_id JOIN users ON User_id = users.id JOIN subject_selection ON Subject_id = subject_selection.id WHERE users.id = %s", session['id'])
+            else:
+                cursor.execute("SELECT * FROM tobheyes_databass.subject_id JOIN users ON User_id = users.id JOIN subject_selection ON Subject_id = subject_selection.id")
+            result = cursor.fetchall()
+    return render_template('selected_subject.html', result=result)
 
 
 if __name__ == '__main__':

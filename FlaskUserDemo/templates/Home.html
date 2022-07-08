@@ -1,0 +1,16 @@
+    {%extends '_layout.html'%}
+
+    {% block title %} Home {% endblock %}
+
+    {% block content %}
+
+<a id="add_subject" href={{ url_for('subject')}}>Add Your Subject</a>
+<br>
+    {% if session['role'] == 'admin' %}
+<a id="create_subject" href={{ url_for('add_subject')}}>Create Subject</a>
+<a id="view_subject" href={{ url_for('selected_subject')}}>View Student Subject</a>
+<a id="list_user" href={{ url_for('list_user')}}>All Student</a>
+
+    {% endif %}
+    {% endblock %}
+

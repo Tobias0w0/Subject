@@ -6,11 +6,30 @@ nav {
 }
 
 
+#add_subject {
+    font-size: 30px;
+    padding-top:100px;
+    padding-left: 260px;
+    padding-right: 400px;
+}
+#create_subject {
+    font-size: 30px;
+    padding-left: 500px;
+    padding-right: 400px;
+}
+
+#view_subject {
+    font-size: 30px;
+    padding-left: 50px;
+    padding-right: 200px;
+}
+
+
 #movie_table {
     border-collapse: collapse;
     margin: auto;
     width: 69%;
-    padding: 50px;
+    padding-left: 50px;
 }
 
 #user_table {
